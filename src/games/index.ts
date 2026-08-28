@@ -19,4 +19,4 @@ registerGame(whackMoleTemplate);
 registerGame(poetryPuzzleTemplate);
 
 /* 统一导出注册表查询接口 */
-export { gameRegistry, getRecommendedGames, getAllGames, getAvailableGames, getBlockReason } from './registry';
+export { gameRegistry, getRecommendedGames, getAllGames, getGamesByType, getGameWarnings } from './registry';

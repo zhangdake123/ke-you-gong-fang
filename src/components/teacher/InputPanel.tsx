@@ -14,6 +14,7 @@
 import { useMemo, useState } from 'react';
 import { useAppStore } from '../../store/useAppStore';
 import { useBankStore } from '../../store/useBankStore';
+import { getGamesByType } from '../../games/registry';
 import { Button } from '../common/Button';
 import { Card } from '../common/Card';
 import { SAMPLE_DATA } from '../../data/samples';
@@ -456,6 +457,20 @@ export function InputPanel() {
               <p className="text-sm text-blue-700 mb-2">
                 {QUESTION_DESCRIPTIONS[questionRequest.questionType]}
               </p>
+              {/* 可玩的小游戏列表 */}
+              <div className="mb-3">
+                <p className="text-xs text-blue-500 mb-1.5 font-medium">可玩的小游戏：</p>
+                <div className="flex flex-wrap gap-1.5">
+                  {getGamesByType(questionRequest.questionType).map((game) => (
+                    <span
+                      key={game.id}
+                      className="inline-flex items-center gap-1 px-2 py-0.5 text-xs bg-white rounded-full border border-blue-200 text-blue-600"
+                    >
+                      {game.icon} {game.name}
+                    </span>
+                  ))}
+                </div>
+              </div>
               <Button
                 size="sm"
                 variant="ghost"

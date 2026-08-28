@@ -9,12 +9,14 @@ import { type ReactNode } from 'react';
 interface CardProps {
   children: ReactNode;
   className?: string;
+  onClick?: () => void;
 }
 
-export function Card({ children, className = '' }: CardProps) {
+export function Card({ children, className = '', onClick }: CardProps) {
   return (
     <div
-      className={`bg-white rounded-xl shadow-sm border border-gray-200 p-6 ${className}`}
+      className={`bg-white rounded-xl shadow-sm border border-gray-200 p-6 ${className} ${onClick ? 'cursor-pointer' : ''}`}
+      onClick={onClick}
     >
       {children}
     </div>
