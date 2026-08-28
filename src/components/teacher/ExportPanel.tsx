@@ -19,6 +19,7 @@ export function ExportPanel() {
   // 全局状态——读取
   const selectedGameId = useAppStore((s) => s.selectedGameId);
   const exportOptions = useAppStore((s) => s.exportOptions);
+  const setExportOptions = useAppStore((s) => s.setExportOptions);
   const questions = useAppStore((s) => s.questions);
   const pairs = useAppStore((s) => s.pairs);
   const contentType = useAppStore((s) => s.contentType);
@@ -137,6 +138,23 @@ export function ExportPanel() {
               {exportOptions.showTimer ? '开启' : '关闭'}
             </span>
           </div>
+          <div className="border-t border-gray-100 my-2" />
+          <div className="flex justify-between text-sm">
+            <span className="text-gray-500">评分报告</span>
+            <span
+              className={`font-medium ${exportOptions.enableScoreReport ? 'text-brand-600' : 'text-gray-400'}`}
+            >
+              {exportOptions.enableScoreReport ? '开启' : '关闭'}
+            </span>
+          </div>
+          {exportOptions.enableScoreReport && exportOptions.scorePassword && (
+            <div className="flex justify-between text-sm">
+              <span className="text-gray-500">查询密码</span>
+              <span className="font-mono text-sm text-brand-600">
+                {exportOptions.scorePassword}
+              </span>
+            </div>
+          )}
         </div>
       </Card>
 

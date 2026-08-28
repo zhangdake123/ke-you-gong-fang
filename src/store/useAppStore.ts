@@ -74,6 +74,8 @@ const defaultExportOptions: ExportOptions = {
   shuffleOptions: true,
   showTimer: true,
   theme: 'default',
+  enableScoreReport: true,
+  scorePassword: '',
 };
 
 const defaultQuestionRequest: QuestionRequest = {
@@ -86,6 +88,7 @@ const defaultQuestionRequest: QuestionRequest = {
   questionType: 'choice',
   difficulty: 'medium',
   count: 5,
+  webSearch: false,
 };
 
 export const useAppStore = create<AppState>((set, get) => ({

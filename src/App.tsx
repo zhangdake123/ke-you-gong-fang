@@ -8,6 +8,7 @@
  * - 底部上一步/下一步操作按钮
  */
 import './games/index'; // 注册所有游戏模板（其他 agent 开发）
+import { useState } from 'react';
 import { useAppStore, type AppStep } from './store/useAppStore';
 import { Button } from './components/common/Button';
 import { StepNav } from './components/common/StepNav';
@@ -16,6 +17,7 @@ import { QuestionEditor } from './components/teacher/QuestionEditor';
 import { GameSelector } from './components/teacher/GameSelector';
 import { GamePreview } from './components/teacher/GamePreview';
 import { ExportPanel } from './components/teacher/ExportPanel';
+import { ScoreReportViewer } from './components/teacher/ScoreReportViewer';
 
 /** 步骤顺序 */
 const STEPS: AppStep[] = ['input', 'edit', 'select', 'preview', 'export'];
@@ -34,6 +36,9 @@ function App() {
   const currentStep = useAppStore((s) => s.currentStep);
   const setStep = useAppStore((s) => s.setStep);
   const selectedGameId = useAppStore((s) => s.selectedGameId);
+
+  // 成绩查询模态框
+  const [showScoreModal, setShowScoreModal] = useState(false);
 
   const currentIndex = STEPS.indexOf(currentStep);
 
@@ -74,8 +79,38 @@ function App() {
               课堂互动游戏生成器
             </span>
           </h1>
+          <div className="ml-auto">
+            <button
+              onClick={() => {
+                setShowScoreModal(!showScoreModal);
+              }}
+              className="px-4 py-2 text-sm text-brand-600 bg-brand-50 rounded-lg hover:bg-brand-100 transition-colors font-medium"
+            >
+              📊 查询学生成绩
+            </button>
+          </div>
         </div>
       </header>
+
+      {/* 成绩查询模态框 */}
+      {showScoreModal && (
+        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-2xl max-w-2xl w-full max-h-[80vh] overflow-y-auto">
+            <div className="flex items-center justify-between p-4 border-b border-gray-100">
+              <h2 className="text-lg font-semibold text-gray-800">成绩查询</h2>
+              <button
+                onClick={() => setShowScoreModal(false)}
+                className="text-gray-400 hover:text-gray-600"
+              >
+                ✕
+              </button>
+            </div>
+            <div className="p-4">
+              <ScoreReportViewer />
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* ========== 主内容区 ========== */}
       <div className="flex flex-1 overflow-hidden">

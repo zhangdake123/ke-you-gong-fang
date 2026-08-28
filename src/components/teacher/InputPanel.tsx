@@ -13,6 +13,7 @@
  */
 import { useMemo, useState } from 'react';
 import { useAppStore } from '../../store/useAppStore';
+import { useBankStore } from '../../store/useBankStore';
 import { Button } from '../common/Button';
 import { Card } from '../common/Card';
 // 课本数据（其他 agent 开发）
@@ -96,6 +97,9 @@ export function InputPanel() {
   // 本地状态
   const [apiKey, setApiKey] = useState(() => getDeepSeekApiKey());
   const [selectedKp, setSelectedKp] = useState<string>('');
+
+  // 题库状态
+  const { files, drawConfig, setDrawConfig, drawQuestions } = useBankStore();
 
   // 课本数据：根据年级+学期加载
   const textbook = useMemo(
@@ -470,7 +474,7 @@ export function InputPanel() {
           <input
             type="range"
             min={1}
-            max={20}
+            max={10}
             value={questionRequest.count}
             onChange={(e) =>
               setQuestionRequest({ count: Number(e.target.value) })
@@ -479,7 +483,7 @@ export function InputPanel() {
           />
           <div className="flex justify-between text-xs text-gray-400 mt-1">
             <span>1</span>
-            <span>20</span>
+            <span>10</span>
           </div>
         </div>
       </Card>
@@ -536,6 +540,77 @@ export function InputPanel() {
               }`}
             />
           </button>
+        </div>
+
+        {/* 联网搜索开关 */}
+        {aiEnabled && (
+          <div className="flex items-center justify-between mb-4">
+            <div>
+              <label className="text-sm font-medium text-gray-700">
+                联网搜索出题
+              </label>
+              <p className="text-xs text-gray-400 mt-0.5">
+                AI 可搜索同课文权威练习题作为参考
+              </p>
+            </div>
+            <button
+              type="button"
+              onClick={() => setQuestionRequest({ webSearch: !questionRequest.webSearch })}
+              className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
+                questionRequest.webSearch ? 'bg-brand-600' : 'bg-gray-300'
+              }`}
+            >
+              <span
+                className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                  questionRequest.webSearch ? 'translate-x-6' : 'translate-x-1'
+                }`}
+              />
+            </button>
+          </div>
+        )}
+
+        {/* 题库抽题 */}
+        <div className="mb-4 pt-4 border-t border-gray-100">
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            从题库抽题
+          </label>
+          <div className="flex gap-2 mb-2">
+            <select
+              value={drawConfig.fileId}
+              onChange={(e) => setDrawConfig({ fileId: e.target.value })}
+              className="flex-1 rounded-lg border border-gray-300 px-3 py-2 text-sm focus:ring-2 focus:ring-brand-500 focus:border-brand-500 outline-none"
+            >
+              <option value="">选择题库文件</option>
+              {files.map((f) => (
+                <option key={f.id} value={f.id}>
+                  {f.name}（{f.entries.length} 条）
+                </option>
+              ))}
+            </select>
+            <input
+              type="number"
+              min={1}
+              max={10}
+              value={drawConfig.count}
+              onChange={(e) => setDrawConfig({ count: Math.max(1, Math.min(10, Number(e.target.value) || 1)) })}
+              className="w-16 rounded-lg border border-gray-300 px-2 py-2 text-sm text-center focus:ring-2 focus:ring-brand-500 focus:border-brand-500 outline-none"
+              title="抽取数量"
+            />
+            <Button
+              size="sm"
+              disabled={!drawConfig.fileId}
+              onClick={() => {
+                const result = drawQuestions(drawConfig.fileId, drawConfig.count);
+                if (result) {
+                  setQuestions(result.questions);
+                  setPairs(result.pairs);
+                  setContentType('mixed');
+                }
+              }}
+            >
+              抽题
+            </Button>
+          </div>
         </div>
 
         {/* API Key 输入 */}

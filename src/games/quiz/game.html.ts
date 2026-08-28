@@ -359,9 +359,10 @@ export function generateQuizHTML(content: GameContent, options: ExportOptions): 
   const title = content.title || '闯关问答';
 
   /* 构建题目数据（所有文本经 escapeHtml 转义后 Base64 编码） */
+  const allowedQuestions = content.questions.filter((q) => q.type === 'choice' || q.type === 'truefalse');
   const payload = {
     title: escapeHtml(title),
-    questions: content.questions.map((q) => {
+    questions: allowedQuestions.map((q) => {
       if (q.type === 'choice') {
         return {
           type: 'choice' as const,

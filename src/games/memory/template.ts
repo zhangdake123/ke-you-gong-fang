@@ -15,6 +15,16 @@ export const memoryTemplate: GameTemplate = {
   icon: '🃏',
   supportedTypes: ['memory'],
   minItems: 6,
-  isRecommended: (content) => content.pairs.length >= 6,
+  supportsScoreReport: true,
+  maxItemLength: 20,
+  isBlocked: (content) => {
+    if (content.pairs.length < 4) return true;
+    // 必须偶数配对才能翻牌
+    if (content.pairs.length % 2 !== 0) return true;
+    const maxLen = content.pairs.reduce((max, p) => Math.max(max, p.left.length, p.right.length), 0);
+    return maxLen > 20;
+  },
+  blockReason: '翻牌记忆需要至少 4 对（偶数对）配对，且每项文本不超过 20 字',
+  isRecommended: (content) => content.pairs.length >= 6 && content.pairs.length % 2 === 0,
   generateHTML: (content, options) => generateMemoryHTML(content, options),
 };

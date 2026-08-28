@@ -8,11 +8,15 @@ import { registerGame } from './registry';
 import { quizTemplate } from './quiz/template';
 import { matchingTemplate } from './matching/template';
 import { memoryTemplate } from './memory/template';
+import { whackMoleTemplate } from './whack-mole/template';
+import { poetryPuzzleTemplate } from './poetry-puzzle/template';
 
 /* 注册所有内置游戏 */
 registerGame(quizTemplate);
 registerGame(matchingTemplate);
 registerGame(memoryTemplate);
+registerGame(whackMoleTemplate);
+registerGame(poetryPuzzleTemplate);
 
 /* 统一导出注册表查询接口 */
-export { gameRegistry, getRecommendedGames, getAllGames } from './registry';
+export { gameRegistry, getRecommendedGames, getAllGames, getAvailableGames, getBlockReason } from './registry';

@@ -15,6 +15,12 @@ export const quizTemplate: GameTemplate = {
   icon: '🎯',
   supportedTypes: ['choice', 'truefalse'],
   minItems: 3,
+  supportsScoreReport: true,
+  isBlocked: (content) => {
+    // 必须至少有一道选择题或判断题
+    return content.questions.filter((q) => q.type === 'choice' || q.type === 'truefalse').length === 0;
+  },
+  blockReason: '闯关问答需要至少 3 道选择题或判断题',
   isRecommended: (content) =>
     content.questions.some((q) => q.type === 'choice' || q.type === 'truefalse'),
   generateHTML: (content, options) => generateQuizHTML(content, options),

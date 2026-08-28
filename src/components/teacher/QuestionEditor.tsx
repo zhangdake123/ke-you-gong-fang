@@ -6,8 +6,10 @@
  * 底部显示题目总数和题型统计。
  */
 import { useAppStore } from '../../store/useAppStore';
+import { useBankStore } from '../../store/useBankStore';
 import { Button } from '../common/Button';
 import { Card } from '../common/Card';
+import { useState } from 'react';
 import type {
   ChoiceQuestion,
   TrueFalseQuestion,
@@ -52,6 +54,7 @@ export function QuestionEditor() {
   const questions = useAppStore((s) => s.questions);
   const pairs = useAppStore((s) => s.pairs);
   const contentType = useAppStore((s) => s.contentType);
+  const title = useAppStore((s) => s.title);
 
   // 全局状态——动作
   const setQuestions = useAppStore((s) => s.setQuestions);
@@ -61,6 +64,11 @@ export function QuestionEditor() {
   const updatePair = useAppStore((s) => s.updatePair);
   const deletePair = useAppStore((s) => s.deletePair);
   const addPair = useAppStore((s) => s.addPair);
+
+  // 题库状态
+  const { files, selectedFileId, setSelectedFileId, saveEntry } = useBankStore();
+  const [showSaveModal, setShowSaveModal] = useState(false);
+  const [saveTitle, setSaveTitle] = useState(title);
 
   // ==================== 事件处理 ====================
 
@@ -448,18 +456,80 @@ export function QuestionEditor() {
         </>
       )}
 
-      {/* 统计信息 */}
-      <div className="flex items-center gap-4 px-4 py-3 rounded-lg bg-gray-50 border border-gray-200 text-sm">
-        <span className="font-medium text-gray-700">
-          共 {totalCount} 项
-        </span>
-        <span className="text-gray-400">|</span>
-        <span className="text-gray-600">选择题 {choiceCount}</span>
-        <span className="text-gray-600">判断题 {truefalseCount}</span>
-        {pairCount > 0 && (
-          <span className="text-gray-600">配对 {pairCount}</span>
+      {/* 统计信息 + 保存到题库 */}
+      <div className="flex items-center justify-between gap-4 px-4 py-3 rounded-lg bg-gray-50 border border-gray-200">
+        <div className="flex items-center gap-4 text-sm">
+          <span className="font-medium text-gray-700">
+            共 {totalCount} 项
+          </span>
+          <span className="text-gray-400">|</span>
+          <span className="text-gray-600">选择题 {choiceCount}</span>
+          <span className="text-gray-600">判断题 {truefalseCount}</span>
+          {pairCount > 0 && (
+            <span className="text-gray-600">配对 {pairCount}</span>
+          )}
+        </div>
+        {totalCount > 0 && (
+          <Button size="sm" onClick={() => setShowSaveModal(true)}>
+            💾 保存到题库
+          </Button>
         )}
       </div>
+
+      {/* 保存到题库模态框 */}
+      {showSaveModal && (
+        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-2xl max-w-md w-full p-6">
+            <h3 className="text-base font-semibold text-gray-800 mb-4">保存到题库</h3>
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">题目名称</label>
+                <input
+                  type="text"
+                  value={saveTitle}
+                  onChange={(e) => setSaveTitle(e.target.value)}
+                  className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:ring-2 focus:ring-brand-500 focus:border-brand-500 outline-none"
+                  placeholder="输入题目名称"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">保存到</label>
+                <select
+                  value={selectedFileId}
+                  onChange={(e) => setSelectedFileId(e.target.value)}
+                  className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:ring-2 focus:ring-brand-500 focus:border-brand-500 outline-none"
+                >
+                  {files.map((f) => (
+                    <option key={f.id} value={f.id}>
+                      {f.name}（{f.entries.length} 条）
+                    </option>
+                  ))}
+                </select>
+              </div>
+            </div>
+            <div className="flex gap-2 justify-end mt-6">
+              <Button variant="secondary" onClick={() => setShowSaveModal(false)}>
+                取消
+              </Button>
+              <Button
+                onClick={() => {
+                  if (saveTitle.trim()) {
+                    saveEntry(saveTitle.trim(), {
+                      title: saveTitle.trim(),
+                      questions,
+                      pairs,
+                      contentType,
+                    }, selectedFileId || files[0]?.id);
+                    setShowSaveModal(false);
+                  }
+                }}
+              >
+                保存
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

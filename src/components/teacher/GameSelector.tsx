@@ -7,7 +7,7 @@
  */
 import { useMemo } from 'react';
 import { useAppStore } from '../../store/useAppStore';
-import { getAllGames, getRecommendedGames } from '../../games/registry';
+import { getAllGames, getRecommendedGames, getAvailableGames, getBlockReason } from '../../games/registry';
 
 /** 题型短标签 */
 const TYPE_LABELS: Record<string, string> = {
@@ -28,8 +28,15 @@ export function GameSelector() {
   // 全局状态——动作
   const setSelectedGameId = useAppStore((s) => s.setSelectedGameId);
 
-  // 所有已注册游戏
-  const allGames = useMemo(() => getAllGames(), []);
+  // 所有可用的游戏（排除被阻塞的）
+  const allGames = useMemo(() => {
+    return getAvailableGames({
+      title,
+      questions,
+      pairs,
+      contentType,
+    });
+  }, [title, questions, pairs, contentType]);
 
   // 推荐游戏
   const recommendedGames = useMemo(
