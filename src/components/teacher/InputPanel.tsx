@@ -460,10 +460,10 @@ export function InputPanel() {
         </div>
 
         {/* 题目数量 */}
-        <div>
+        <div className="max-w-full">
           <label className="flex items-center justify-between text-sm font-medium text-gray-700 mb-2">
             <span>题目数量</span>
-            <span className="text-brand-600 font-semibold">
+            <span className="text-brand-600 font-semibold whitespace-nowrap">
               {questionRequest.count} 题
             </span>
           </label>
