@@ -24,6 +24,12 @@ export interface PromptConfig {
   system: string;
   /** 各题型提示词模板（键为 QuestionType） */
   templates: Record<string, string>;
+  /** 联网搜索模式的补充系统提示词 */
+  webSearchSystem?: string;
+  /** 构建 content 部分的函数 */
+  buildContentSection?: (content: string, webSearch: boolean) => string;
+  /** 课本内容在线来源 */
+  textbookUrls?: string;
 }
 
 /** 学科提示词映射表 */

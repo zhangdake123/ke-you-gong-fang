@@ -18,6 +18,7 @@ import { GameSelector } from './components/teacher/GameSelector';
 import { GamePreview } from './components/teacher/GamePreview';
 import { ExportPanel } from './components/teacher/ExportPanel';
 import { ScoreReportViewer } from './components/teacher/ScoreReportViewer';
+import { BankManager } from './components/teacher/BankManager';
 
 /** 步骤顺序 */
 const STEPS: AppStep[] = ['input', 'edit', 'select', 'preview', 'export'];
@@ -39,6 +40,8 @@ function App() {
 
   // 成绩查询模态框
   const [showScoreModal, setShowScoreModal] = useState(false);
+  // 题库管理模态框
+  const [showBankModal, setShowBankModal] = useState(false);
 
   const currentIndex = STEPS.indexOf(currentStep);
 
@@ -79,14 +82,22 @@ function App() {
               课堂互动游戏生成器
             </span>
           </h1>
-          <div className="ml-auto">
+          <div className="ml-auto flex items-center gap-2">
+            <button
+              onClick={() => {
+                setShowBankModal(!showBankModal);
+              }}
+              className="px-4 py-2 text-sm text-brand-600 bg-brand-50 rounded-lg hover:bg-brand-100 transition-colors font-medium"
+            >
+              📚 题库管理
+            </button>
             <button
               onClick={() => {
                 setShowScoreModal(!showScoreModal);
               }}
               className="px-4 py-2 text-sm text-brand-600 bg-brand-50 rounded-lg hover:bg-brand-100 transition-colors font-medium"
             >
-              📊 查询学生成绩
+              📊 查询成绩
             </button>
           </div>
         </div>
@@ -107,6 +118,26 @@ function App() {
             </div>
             <div className="p-4">
               <ScoreReportViewer />
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* 题库管理模态框 */}
+      {showBankModal && (
+        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-2xl max-w-3xl w-full max-h-[80vh] overflow-y-auto">
+            <div className="flex items-center justify-between p-4 border-b border-gray-100">
+              <h2 className="text-lg font-semibold text-gray-800">题库管理</h2>
+              <button
+                onClick={() => setShowBankModal(false)}
+                className="text-gray-400 hover:text-gray-600"
+              >
+                ✕
+              </button>
+            </div>
+            <div className="p-4">
+              <BankManager />
             </div>
           </div>
         </div>

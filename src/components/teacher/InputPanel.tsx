@@ -16,6 +16,7 @@ import { useAppStore } from '../../store/useAppStore';
 import { useBankStore } from '../../store/useBankStore';
 import { Button } from '../common/Button';
 import { Card } from '../common/Card';
+import { SAMPLE_DATA } from '../../data/samples';
 // 课本数据（其他 agent 开发）
 import { textbooks, getTextbooks } from '../../data/textbooks';
 // AI 出题相关（其他 agent 开发）
@@ -61,6 +62,15 @@ const GRADES = [1, 2, 3, 4, 5, 6];
 
 /** 学期列表 */
 const SEMESTERS: Semester[] = ['上册', '下册'];
+
+/** 题型描述 */
+const QUESTION_DESCRIPTIONS: Record<string, string> = {
+  choice: '选择题：四个选项中选出一个正确答案，最通用，适合知识点考察。',
+  truefalse: '判断题：判断正误，适合概念辨析，出题快理解简单。',
+  matching: '配对题：左右内容配对，适合反义词/近义词/作者作品配对。',
+  memory: '翻牌记忆：两两配对找相同，适合字词/拼音记忆。',
+  ordering: '排序题：按正确顺序排列，适合古诗词/段落排序练习。',
+};
 
 // ==================== 通用样式 ====================
 
@@ -440,6 +450,37 @@ export function InputPanel() {
               );
             })}
           </div>
+          {/* 题型说明 + 加载示例按钮 */}
+          {questionRequest.questionType && (
+            <div className="mt-3 p-3 bg-blue-50 rounded-lg border border-blue-100">
+              <p className="text-sm text-blue-700 mb-2">
+                {QUESTION_DESCRIPTIONS[questionRequest.questionType]}
+              </p>
+              <Button
+                size="sm"
+                variant="ghost"
+                onClick={() => {
+                  const type = questionRequest.questionType;
+                  if (type === 'matching' || type === 'memory') {
+                    const pairs = SAMPLE_DATA[type];
+                    setQuestions([]);
+                    setPairs(pairs);
+                    setContentType(type);
+                  } else {
+                    const samples = SAMPLE_DATA[type];
+                    if ('length' in samples && samples.length > 0) {
+                      setQuestions(samples as Question[]);
+                      setPairs([]);
+                      setContentType(type);
+                    }
+                  }
+                  setStep('edit');
+                }}
+              >
+                👀 加载示例预览
+              </Button>
+            </div>
+          )}
         </div>
 
         {/* 难度选择 */}

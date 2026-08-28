@@ -103,6 +103,7 @@ export class DeepSeekProvider implements AIProvider {
     // 启用联网搜索时，在请求中加入 web_search 工具
     if (options?.webSearch) {
       body.tools = [{ type: 'web_search' }];
+      body.tool_choice = 'auto';
     }
 
     const url = `${this.baseURL}/chat/completions`;

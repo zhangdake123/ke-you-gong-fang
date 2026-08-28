@@ -12,6 +12,7 @@ import type {
   Question,
   QuestionType,
   TrueFalseQuestion,
+  OrderingQuestion,
 } from '../../types';
 
 /**
@@ -179,6 +180,62 @@ function validateMatchPair(item: unknown, index: number): MatchPair {
   return { id: generateId(), left, right };
 }
 
+/** 校验并标准化排序题 */
+function validateOrderingQuestion(
+  item: unknown,
+  index: number,
+  difficulty: Difficulty,
+): OrderingQuestion {
+  if (typeof item !== 'object' || item === null) {
+    throw new Error(`第 ${index + 1} 道排序题格式异常：不是有效对象`);
+  }
+
+  const obj = item as Record<string, unknown>;
+
+  // 校验题干
+  const question = obj.question;
+  if (typeof question !== 'string' || question.trim().length === 0) {
+    throw new Error(`第 ${index + 1} 道排序题缺少题干（question）`);
+  }
+
+  // 校验片段
+  const segments = obj.segments;
+  if (!Array.isArray(segments) || segments.length < 2) {
+    throw new Error(`第 ${index + 1} 道排序题需要至少 2 个片段（segments）`);
+  }
+  for (let i = 0; i < segments.length; i++) {
+    if (typeof segments[i] !== 'string' || segments[i].trim().length === 0) {
+      throw new Error(`第 ${index + 1} 道排序题的第 ${i + 1} 个片段无效`);
+    }
+  }
+
+  // 校验正确顺序
+  const correctOrder = obj.correctOrder;
+  if (!Array.isArray(correctOrder) || correctOrder.length !== segments.length) {
+    throw new Error(`第 ${index + 1} 道排序题的 correctOrder 长度必须与 segments 一致`);
+  }
+  for (let i = 0; i < correctOrder.length; i++) {
+    if (typeof correctOrder[i] !== 'number' || !Number.isInteger(correctOrder[i])) {
+      throw new Error(`第 ${index + 1} 道排序题的 correctOrder 索引必须为整数`);
+    }
+  }
+
+  const explanation =
+    typeof obj.explanation === 'string' && obj.explanation.trim().length > 0
+      ? obj.explanation
+      : undefined;
+
+  return {
+    id: generateId(),
+    type: 'ordering',
+    difficulty,
+    question,
+    segments,
+    correctOrder,
+    explanation,
+  };
+}
+
 /**
  * 解析 AI 返回的文本，提取并标准化为题目数据。
  *
@@ -231,6 +288,9 @@ export function parseAIResponse(
     return data.map((item, index) =>
       validateTrueFalseQuestion(item, index, diff),
     );
+  }
+  if (type === 'ordering') {
+    return data.map((item, index) => validateOrderingQuestion(item, index, diff));
   }
   // matching 或 memory 都解析为配对数组
   return data.map((item, index) => validateMatchPair(item, index));
